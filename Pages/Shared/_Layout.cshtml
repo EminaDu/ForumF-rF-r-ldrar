@@ -1,0 +1,91 @@
+﻿@using ForumFörFöräldrar.Areas.Identity.Data;
+@using ForumFörFöräldrar.Data;
+@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<ForumFörFöräldrarUserT> SignInManager
+@inject UserManager<ForumFörFöräldrarUserT> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject ForumFörFöräldrarContext Context
+@{
+    var currentUser = await UserManager.GetUserAsync(User);
+    bool isAdmin = false;
+    if (currentUser != null)
+    {
+        isAdmin = await UserManager.IsInRoleAsync(currentUser, "Admin");
+    }
+    string newMessages = string.Empty;
+    if (SignInManager.IsSignedIn(User))
+    {
+        var messages = Context.Message.Where(x => x.ReceiverId == currentUser.Id).ToList();
+        if (messages.Count == 0 || messages == null)
+        {
+            newMessages = string.Empty;
+        }
+        else
+        {
+            var unread = messages.Where(x => x.IsRead == false).ToList();
+            newMessages = "(" + unread.Count + ")";
+        }
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ForumFörFöräldrar</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ForumFörFöräldrar.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-page="/Index">ForumFörFöräldrar</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Forum">Forum</a>
+                        </li>
+                        @if (SignInManager.IsSignedIn(User))
+						{
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-page="/Inbox">Meddelanden <strong>@newMessages</strong></a>
+							</li>
+						}
+						@if (SignInManager.IsSignedIn(User) && isAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Admin/Index">Admin</a>
+                            </li>
+                        }
+                    </ul>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2023 - ForumFörFöräldrar - <a asp-area="" asp-page="/Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

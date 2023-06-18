@@ -1,0 +1,26 @@
+﻿
+@page
+@model ForumFörFöräldrar.Pages.Admin.Offensive.IndexModel
+<div class="container py-2">
+    <h1>Anmälda inlägg</h1>
+    <table class="table table table-hover ">
+        <tr>
+            <th>Användare</th>
+            <th>Datum</th>
+            <th>Rubrik</th>
+            <th>Text</th>
+            <th>Ändra</th>
+            <th>Ta bort</th>
+        </tr>
+        @foreach (var post in Model.ReportedPosts)
+        {
+            <tr>
+                <td>@Model.Users.FirstOrDefault(u => u.Id == post.UserId).UserName</td>
+                <td>@post.Date</td>
+                <td>@post.Header</td>
+                <td>@post.Text</td>
+                <td><a class="btn btn-light btn-sm" asp-route-changeId="@post.Id">Markera som ej stötande</a> </td>
+                <td><a class="btn btn-outline-light btn-sm" asp-route-deleteId="@post.Id">Stötande inlägg - Radera</a></td> 
+            </tr>
+        }
+</div>

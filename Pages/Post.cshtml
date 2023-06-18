@@ -1,0 +1,119 @@
+﻿@page
+@model ForumFörFöräldrar.Pages.PostModel
+@inject SignInManager<ForumFörFöräldrarUserT> SignInManager
+@inject UserManager<ForumFörFöräldrarUserT> UserManager
+@{
+    string[] headlines = new string[] { "Ämne", "Kommentarer", "Skapare", "Skapat" };
+    var user = await UserManager.GetUserAsync(User);
+    var datenow = DateTime.Now;
+}
+@using ForumFörFöräldrar.Areas.Identity.Data;
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.AspNetCore.Mvc.RazorPages
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+
+<div class="card border-2">
+    <div class="card-header bg-info-50 text-black-75 fs-4 fw-bold">
+        @Model.ForumSubCategory.Name
+    </div>
+    <div class="m-0 p-0 text-start">
+        <table class="table table m-0 p-0">
+            <tbody>
+                @foreach (var posts in Model.Posts)
+                {
+                    <tr>
+                        <td>
+                            <h6><a class="mb-1 text-dark" id="forumpostheader" asp-route-id="@posts.Id" asp-page="./Comment">@posts.Header</a></h6>
+                            @foreach (var u in Model.Users)
+                            {
+                                @if (@u.Id == @posts.UserId && @u.UserName != null)
+                                {
+                                    <div class="row">
+                                        <p class="mb-0">
+                                            <a class="text-black-50 fw-bold text-decoration-none pb-0 mb-0" asp-page="./Post" asp-route-userid="@u.Id">@u.UserName</a>
+                                           @* <span class="fw-lighter ms-1">@posts.Date</span*@
+                                        </p>
+                                    </div>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<br />
+@{
+    var prevDisabled = !Model.Posts.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.Posts.HasNextPage ? "disabled" : "";
+}
+
+<div>
+    <ul class="pagination">
+        @if (Model.Posts.HasPreviousPage)
+        {
+            <li class="page-item">
+                <a class="page-link bg-light text-black" asp-page="./Post" asp-route-pageIndex="@(Model.Posts.PageIndex - 1)">Förgående</a>
+            </li>
+        }
+        @for (int i = 1; i <= Model.Posts.TotalPages; i++)
+        {
+            <li class="page-item @(Model.Posts.PageIndex == i ? "active" : "")">
+                <a class="page-link bg-light text-black" asp-page="./Post" asp-route-pageIndex="@i">@i</a>
+            </li>
+        }
+        @if (Model.Posts.HasNextPage)
+        {
+            <li class="page-item">
+                <a class="page-link bg-light text-black" asp-page="./Post" asp-route-pageIndex="@(Model.Posts.PageIndex + 1)">Nästa</a>
+            </li>
+        }
+    </ul>
+</div>
+<a asp-page="./Forum" class="btn btn-secondary">Tillbaka</a>
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <a name="newpost" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#newpost">Skapa ny post</a>
+
+    <div class="modal fade" id="newpost" tabindex="-1" aria-labelledby="newpostLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="newpostLabel">Ny tråd</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" enctype="multipart/form-data">
+                        <input asp-for="Post.UserId" type="hidden" value="@user.Id" />
+                        <input asp-for="Post.Date" type="hidden" value="@datenow" />
+                        <input asp-for="Post.ForumSubCategoryId" type="hidden" value="@Model.ForumSubCategory.Id" />
+
+                        <div class="mb-3">
+                            <label for="header" class="col-form-label">
+                                Rubrik:
+                            </label>
+                            <input class="form-control" id="header" asp-for="Post.Header" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="text" class="col-form-label">
+                                Text:
+                            </label>
+                            <textarea asp-for="Post.Text" class="form-control" cols="40" rows="10" id="text"></textarea>
+
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Skapa post</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

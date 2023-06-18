@@ -1,0 +1,74 @@
+﻿@page
+@model ForumFörFöräldrar.Pages.ForumModel
+@{
+    ViewData["Title"] = "Startsida";
+}
+<form>
+	<p>
+		<select asp-for="@Model.ChooseableTopics" asp-items="@Model.ForumSubCategories.Select(s => new SelectListItem { Value = s.Name, Text = s.Name })">
+			<option value="">All</option>
+		</select>
+		@*<input type="text" asp-for="@Model.SearchString" placeholder="Sök..." />
+		<input type="submit" value="Filter" />*@
+	</p>
+</form>
+@if (Model.SearchString != null)
+{
+    @foreach (var item in Model.ForumSubCategories)
+    {
+        @if (string.IsNullOrEmpty(Model.SearchString) || (item.Posts != null && item.Posts.Any(np => np.Header != null && np.Header.IndexOf(Model.SearchString, StringComparison.OrdinalIgnoreCase) >= 0) && (string.IsNullOrEmpty(Model.ChooseableTopics) || item.Name == Model.ChooseableTopics)))
+        {
+            <div class="card border-2 mb-4">
+                <div class="card-header bg-light text-black-75 fs-4 fw-bold">
+                    @Html.DisplayFor(modelItem => item.Name)
+                </div>
+                <table class="table table m-0 p-0">
+                  
+                    <tbody>
+                        @foreach (var post in item.Posts.Where(np => np.Header != null && np.Header.IndexOf(Model.SearchString, StringComparison.OrdinalIgnoreCase) >= 0))
+                        {
+                            <tr>
+                                <td>
+                                    <div><a asp-page="./PostComment" asp-route-id="@post.Id" class="text-black col-4 text-decoration-none">@Html.DisplayFor(modelPost => post.Header)</a></div>
+                                </td>
+                                <td>
+                                    <p class="fw-lighter text-end me-5">@item.Posts.Count</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+}
+
+else
+{
+    foreach (var forum in @Model.ForumMainCategories)
+    {
+        <div class="card border-2 mb-4">
+            <div class="card-header bg-light text-black-75 fs-4 fw-bold">
+                @forum.Name
+            </div>
+            <div class="m-0 p-0 text-start">
+                <table class="table table m-0 p-0">
+               
+                    <tbody>
+                        @foreach (var subforum in @forum.ForumSubCategories)
+                        {
+                            <tr>
+                                <td class="col-8">
+                                    <a class="text-dark" asp-route-id="@subforum.Id" asp-page="./Post">@subforum.Name</a>
+                                </td>
+                                <td>
+                                    <p class="fw-lighter text-end me-5">@subforum.Posts.Count</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
