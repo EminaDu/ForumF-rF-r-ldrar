@@ -4,7 +4,7 @@ namespace ForumFörFöräldrar.DAL
 {
 	public class ForumMainCategoryManager
 	{
-		private static Uri BaseAddress = new Uri("https://localhost:44348/");
+		private static Uri BaseAddress = new Uri("https://eminaforumapi.azurewebsites.net/");
 		private static string basePath = "api/ForumMainCategory";
         public static async Task<List<Models.ForumMainCategory>> GetAllForumMainCategories()
 		{
