@@ -31,7 +31,7 @@ namespace ForumFörFöräldrar.Pages.Admin.Offensive
                     _context.Post.Remove(post);
                     await _context.SaveChangesAsync();
 
-                    return RedirectToPage("./Offensive");
+                    return Redirect("~/");
                 }
             }
             if (changeId != 0)
@@ -42,7 +42,7 @@ namespace ForumFörFöräldrar.Pages.Admin.Offensive
                 {
                     offensivePost.Offensive = false;
                     await _context.SaveChangesAsync();
-                    return RedirectToPage("./Offensive");
+                    return Redirect("~/");
                 }
             }
             return Page();

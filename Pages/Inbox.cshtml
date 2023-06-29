@@ -11,7 +11,7 @@
 }
 @if (SignInManager.IsSignedIn(User))
 {
-	<a name="sendNewMessage" class="btn btn-info-75 me-2 mb-2" data-bs-toggle="modal" data-bs-target="#sendNewMessage">Skicka nytt meddelande</a>
+	<a name="sendNewMessage" class="btn btn-secondary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#sendNewMessage">Skicka nytt meddelande</a>
 
 
 	<div class="modal fade" id="sendNewMessage" tabindex="-1" aria-labelledby="sendNewMessageLabel" aria-hidden="true">
@@ -44,7 +44,6 @@
 
 	@if (Model.Messages != null)
 	{
-
 		<div class="card border-2">
 			<div class="card-header bg-info-50 text-black fs-4 fw-bold">
 				Inbox
